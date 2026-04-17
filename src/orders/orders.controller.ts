@@ -16,7 +16,7 @@ export class OrdersController {
 
   @Post('webhook')
   handleWebhook(
-    @Req() req: RawBodyRequest<Request>,
+    @Req() req: any,
     @Headers('stripe-signature') signature: string,
   ) {
     return this.ordersService.handleWebhook(req.rawBody!, signature);
