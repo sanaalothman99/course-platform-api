@@ -1,0 +1,101 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model User {
+  id        String    @id @default(uuid())
+  email     String    @unique
+  password  String
+  name      String
+  role      Role      @default(STUDENT)
+  createdAt DateTime  @default(now())
+  comments  Comment[]
+  orders    Order[]
+  progress Progress[]
+}
+
+model Course {
+  id          String   @id @default(uuid())
+  title       String
+  description String
+  price       Float
+  level       String
+  isPublished Boolean  @default(false)
+  createdAt   DateTime @default(now())
+  thumbnail   String?
+  comingSoon  Boolean? @default(false)
+  hasLevels   Boolean? @default(false)
+  parentId    String?
+  parent      Course?  @relation("CourseLevel", fields: [parentId], references: [id])
+  children    Course[] @relation("CourseLevel")
+  lessons     Lesson[]
+  orders      Order[]
+  previewUrl String?
+  chapters   Chapter[]
+}
+
+model Lesson {
+  id          String    @id @default(uuid())
+  title       String
+  videoUrl    String?
+  position    Int
+  courseId    String
+  description String?
+  pdfUrl      String?
+  chapterId String?
+  progress Progress[]
+  chapter   Chapter? @relation(fields: [chapterId], references: [id]) 
+  comments    Comment[]
+  course      Course    @relation(fields: [courseId], references: [id])
+}
+
+model Order {
+  id       String   @id @default(uuid())
+  userId   String
+  courseId String
+  paidAt   DateTime @default(now())
+  course   Course   @relation(fields: [courseId], references: [id])
+  user     User     @relation(fields: [userId], references: [id])
+}
+
+model Comment {
+  id        String    @id @default(uuid())
+  content   String
+  userId    String
+  lessonId  String
+  parentId  String?
+  createdAt DateTime  @default(now())
+  lesson    Lesson    @relation(fields: [lessonId], references: [id], onDelete: NoAction, onUpdate: NoAction)
+  parent    Comment?  @relation("CommentReplies", fields: [parentId], references: [id], onDelete: NoAction, onUpdate: NoAction)
+  replies   Comment[] @relation("CommentReplies")
+  user      User      @relation(fields: [userId], references: [id], onDelete: NoAction, onUpdate: NoAction)
+}
+model Chapter {
+  id        String   @id @default(uuid())
+  title     String
+  position  Int
+  courseId  String
+  createdAt DateTime @default(now())
+  course    Course   @relation(fields: [courseId], references: [id])
+  lessons   Lesson[]
+}
+model Progress {
+  id          String   @id @default(uuid())
+  userId      String
+  lessonId    String
+  completedAt DateTime @default(now())
+  user        User     @relation(fields: [userId], references: [id])
+  lesson      Lesson   @relation(fields: [lessonId], references: [id])
+
+  @@unique([userId, lessonId])
+}
+
+enum Role {
+  ADMIN
+  STUDENT
+}
