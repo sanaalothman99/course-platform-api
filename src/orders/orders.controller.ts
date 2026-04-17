@@ -19,7 +19,7 @@ export class OrdersController {
     @Req() req: any,
     @Headers('stripe-signature') signature: string,
   ) {
-    return this.ordersService.handleWebhook(req.rawBody!, signature);
+    return this.ordersService.handleWebhook(req.rawBody, signature);
   }
 
   @Get('my-courses')
