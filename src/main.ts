@@ -5,7 +5,8 @@ async function bootstrap() {
   const app = await NestFactory.create(AppModule, {
     rawBody: true,
   });
-  app.enableCors();
-  await app.listen(process.env.PORT || 3001);
-}
+app.enableCors({
+  origin: ['https://course-platform-gkdsevvbd-sanaalothman99s-projects.vercel.app', 'http://localhost:3000'],
+  credentials: true,
+});}
 bootstrap();
