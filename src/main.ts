@@ -7,9 +7,12 @@ async function bootstrap() {
   });
   
   app.enableCors({
-    origin: ['https://course-platform-gkdsevvbd-sanaalothman99s-projects.vercel.app', 'http://localhost:3000'],
-    credentials: true,
-  });
+  origin: [
+    'https://course-platform-two-pi.vercel.app',
+    'http://localhost:3000'
+  ],
+  credentials: true,
+});
 
   const port = process.env.PORT || 3001;
   await app.listen(port);
