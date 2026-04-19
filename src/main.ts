@@ -1,17 +1,20 @@
-import { createServer } from 'http';
+import { NestFactory } from '@nestjs/core';
+import { AppModule } from './app.module';
 
-const port = Number(process.env.PORT) || 3001;
+async function bootstrap() {
+  const app = await NestFactory.create(AppModule, {
+    rawBody: true,
+  });
+  
+  app.enableCors({
+    origin: ['https://course-platform-gkdsevvbd-sanaalothman99s-projects.vercel.app', 'http://localhost:3000'],
+    credentials: true,
+  });
 
-const server = createServer((req, res) => {
-  res.statusCode = 200;
-  res.setHeader('Content-Type', 'application/json');
-  res.end(JSON.stringify({
-    ok: true,
-    url: req.url,
-    port,
-  }));
-});
+  const port = process.env.PORT || 3001;
+  await app.listen(port);
+  
+  console.log(`Application running on port ${port}`);
+}
 
-server.listen(port, '0.0.0.0', () => {
-  console.log(`Plain Node server running on port ${port}`);
-});
+bootstrap();
