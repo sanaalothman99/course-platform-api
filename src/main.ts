@@ -6,8 +6,10 @@ async function bootstrap() {
     rawBody: true,
   });
   
-  app.enableCors({
+ app.enableCors({
   origin: [
+    'https://atozautomation.de',
+    'https://www.atozautomation.de',
     'https://course-platform-two-pi.vercel.app',
     'http://localhost:3000'
   ],
