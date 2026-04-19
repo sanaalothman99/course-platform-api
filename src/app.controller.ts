@@ -1,4 +1,4 @@
-/*import { Controller, Get } from '@nestjs/common';
+import { Controller, Get } from '@nestjs/common';
 import { AppService } from './app.service';
 
 @Controller()
@@ -15,14 +15,5 @@ export class AppController {
 
     return { ok: true };
 
-  }
-}*/
-import { Controller, Get } from '@nestjs/common';
-
-@Controller()
-export class AppController {
-  @Get('health')
-  health() {
-    return { ok: true };
   }
 }
