@@ -17,6 +17,24 @@ export class CoursesController {
   findOne(@Param('id') id: string) {
     return this.coursesService.findOne(id);
   }
+  @Put(':id')
+@UseGuards(JwtAuthGuard, RolesGuard)
+@Roles('ADMIN')
+update(
+  @Param('id') id: string,
+  @Body() body: Partial<{
+    title: string;
+    description: string;
+    price: number;
+    level: string;
+    thumbnail: string;
+    comingSoon: boolean;
+    hasLevels: boolean;
+    previewUrl: string;
+  }>,
+) {
+  return this.coursesService.update(id, body);
+}
 
   @Post()
   @UseGuards(JwtAuthGuard, RolesGuard)
