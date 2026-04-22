@@ -19,6 +19,7 @@ model User {
   progress Progress[]
 }
 
+
 model Course {
   id          String   @id @default(uuid())
   title       String
@@ -28,6 +29,7 @@ model Course {
   isPublished Boolean  @default(false)
   createdAt   DateTime @default(now())
   thumbnail   String?
+  bannerImage String?
   comingSoon  Boolean? @default(false)
   hasLevels   Boolean? @default(false)
   parentId    String?
