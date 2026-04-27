@@ -46,4 +46,23 @@ export class OrdersController {
 grantAccess(@Body() body: { userId: string; courseId: string }) {
   return this.ordersService.grantAccess(body.userId, body.courseId);
 }
+@Post('certificate')
+@UseGuards(JwtAuthGuard, RolesGuard)
+@Roles('ADMIN')
+uploadCertificate(@Body() body: { userId: string; courseId: string; certificateUrl: string }) {
+  return this.ordersService.uploadCertificate(body.userId, body.courseId, body.certificateUrl);
+}
+
+@Get('certificates')
+@UseGuards(JwtAuthGuard)
+getUserCertificates(@Request() req: any) {
+  return this.ordersService.getUserCertificates(req.user.id);
+}
+
+@Get('completed-students/:courseId')
+@UseGuards(JwtAuthGuard, RolesGuard)
+@Roles('ADMIN')
+getCompletedStudents(@Param('courseId') courseId: string) {
+  return this.ordersService.getCompletedStudents(courseId);
+}
 }

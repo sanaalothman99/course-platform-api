@@ -14,11 +14,11 @@ model User {
   name      String
   role      Role      @default(STUDENT)
   createdAt DateTime  @default(now())
+  deviceId  String?
   comments  Comment[]
   orders    Order[]
-  progress Progress[]
+  progress  Progress[]
 }
-
 
 model Course {
   id          String   @id @default(uuid())
@@ -37,8 +37,8 @@ model Course {
   children    Course[] @relation("CourseLevel")
   lessons     Lesson[]
   orders      Order[]
-  previewUrl String?
-  chapters   Chapter[]
+  previewUrl  String?
+  chapters    Chapter[]
 }
 
 model Lesson {
@@ -49,20 +49,21 @@ model Lesson {
   courseId    String
   description String?
   pdfUrl      String?
-  chapterId String?
-  progress Progress[]
-  chapter   Chapter? @relation(fields: [chapterId], references: [id]) 
+  chapterId   String?
+  progress    Progress[]
+  chapter     Chapter?  @relation(fields: [chapterId], references: [id])
   comments    Comment[]
   course      Course    @relation(fields: [courseId], references: [id])
 }
 
 model Order {
-  id       String   @id @default(uuid())
-  userId   String
-  courseId String
-  paidAt   DateTime @default(now())
-  course   Course   @relation(fields: [courseId], references: [id])
-  user     User     @relation(fields: [userId], references: [id])
+  id              String   @id @default(uuid())
+  userId          String
+  courseId        String
+  paidAt          DateTime @default(now())
+  certificateUrl  String?
+  course          Course   @relation(fields: [courseId], references: [id])
+  user            User     @relation(fields: [userId], references: [id])
 }
 
 model Comment {
@@ -77,6 +78,7 @@ model Comment {
   replies   Comment[] @relation("CommentReplies")
   user      User      @relation(fields: [userId], references: [id], onDelete: NoAction, onUpdate: NoAction)
 }
+
 model Chapter {
   id        String   @id @default(uuid())
   title     String
@@ -86,6 +88,7 @@ model Chapter {
   course    Course   @relation(fields: [courseId], references: [id])
   lessons   Lesson[]
 }
+
 model Progress {
   id          String   @id @default(uuid())
   userId      String

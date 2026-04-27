@@ -1,4 +1,4 @@
-import { Injectable, UnauthorizedException, ConflictException } from '@nestjs/common';
+import { Injectable, UnauthorizedException, ConflictException, ForbiddenException } from '@nestjs/common';
 import { JwtService } from '@nestjs/jwt';
 import { UsersService } from '../users/users.service';
 import * as bcrypt from 'bcrypt';
@@ -36,7 +36,7 @@ export class AuthService {
     };
   }
 
-  async login(email: string, password: string) {
+  async login(email: string, password: string, deviceId?: string) {
     const user = await this.usersService.findByEmail(email);
     if (!user) {
       throw new UnauthorizedException('Invalid credentials');
@@ -45,6 +45,18 @@ export class AuthService {
     const isPasswordValid = await bcrypt.compare(password, user.password);
     if (!isPasswordValid) {
       throw new UnauthorizedException('Invalid credentials');
+    }
+
+    // Device Lock — ADMIN مستثنى
+    if (user.role !== 'ADMIN' && deviceId) {
+      if (user.deviceId && user.deviceId !== deviceId) {
+        throw new ForbiddenException('This account is already logged in on another device. Please contact support to reset your device.');
+      }
+
+      // احفظ الـ deviceId إذا ما في
+      if (!user.deviceId) {
+        await this.usersService.updateDeviceId(user.id, deviceId);
+      }
     }
 
     const token = this.jwtService.sign({ sub: user.id, email: user.email, role: user.role });

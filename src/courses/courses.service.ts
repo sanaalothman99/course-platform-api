@@ -149,13 +149,13 @@ export class CoursesService {
     });
   }
 
-  async getSubCourses(parentId: string) {
-    return this.prisma.course.findMany({
-      where: { parentId },
-      include: { lessons: true },
-    });
-  }
-
+ async getSubCourses(parentId: string) {
+  return this.prisma.course.findMany({
+    where: { parentId },
+    include: { lessons: true },
+    orderBy: { createdAt: 'asc' },
+  });
+}
   async addChapter(courseId: string, data: { title: string; position: number }) {
     return this.prisma.chapter.create({
       data: { ...data, courseId },

@@ -26,29 +26,24 @@ export class OrdersService {
           {
             price_data: {
               currency: 'usd',
-              product_data: {
-                name: course.title,
-              },
+              product_data: { name: course.title },
               unit_amount: Math.round(course.price * 100),
             },
             quantity: 1,
           },
         ],
-        metadata: {
-          userId,
-          courseId,
-        },
+        metadata: { userId, courseId },
       });
 
       return { url: session.url };
-} catch (error) {
-  if (error instanceof Error) {
-    console.error('Stripe Error:', error.message);
-  } else {
-    console.error('Stripe Error:', error);
-  }
-  throw error;
-}
+    } catch (error) {
+      if (error instanceof Error) {
+        console.error('Stripe Error:', error.message);
+      } else {
+        console.error('Stripe Error:', error);
+      }
+      throw error;
+    }
   }
 
   async handleWebhook(payload: Buffer, signature: string) {
@@ -64,7 +59,6 @@ export class OrdersService {
     if (event.type === 'checkout.session.completed') {
       const session = event.data.object as Stripe.Checkout.Session;
       const { userId, courseId } = session.metadata!;
-
       await this.prisma.order.create({
         data: { userId, courseId },
       });
@@ -95,17 +89,77 @@ export class OrdersService {
       },
     });
   }
-  async grantAccess(userId: string, courseId: string) {
-  const existing = await this.prisma.order.findFirst({
-    where: { userId, courseId },
-  });
 
-  if (existing) {
-    return { message: 'User already has access' };
+  async grantAccess(userId: string, courseId: string) {
+    const existing = await this.prisma.order.findFirst({
+      where: { userId, courseId },
+    });
+    if (existing) return { message: 'User already has access' };
+    return this.prisma.order.create({
+      data: { userId, courseId },
+    });
   }
 
-  return this.prisma.order.create({
-    data: { userId, courseId },
-  });
-}
+  async uploadCertificate(userId: string, courseId: string, certificateUrl: string) {
+    const order = await this.prisma.order.findFirst({
+      where: { userId, courseId },
+    });
+    if (!order) throw new Error('Order not found');
+    return this.prisma.order.update({
+      where: { id: order.id },
+      data: { certificateUrl },
+    });
+  }
+
+  async getUserCertificates(userId: string) {
+    return this.prisma.order.findMany({
+      where: {
+        userId,
+        certificateUrl: { not: null },
+      },
+      include: {
+        course: { select: { id: true, title: true, thumbnail: true } },
+      },
+    });
+  }
+
+  async getCompletedStudents(courseId: string) {
+    const lessons = await this.prisma.lesson.findMany({
+      where: { courseId },
+      select: { id: true },
+    });
+
+    const totalLessons = lessons.length;
+    if (totalLessons === 0) return [];
+
+    const orders = await this.prisma.order.findMany({
+      where: { courseId },
+      select: {
+        id: true,
+        userId: true,
+        certificateUrl: true,
+        user: { select: { id: true, name: true, email: true } },
+      },
+    });
+
+   const result: any[] = [];
+    for (const order of orders) {
+      const completedCount = await this.prisma.progress.count({
+        where: {
+          userId: order.userId,
+          lesson: { courseId },
+        },
+      });
+      const percentage = Math.round((completedCount / totalLessons) * 100);
+      result.push({
+        user: order.user,
+        orderId: order.id,
+        certificateUrl: order.certificateUrl,
+        progress: percentage,
+        completed: percentage === 100,
+      });
+    }
+
+    return result;
+  }
 }
