@@ -20,7 +20,7 @@ const s3 = new S3Client({
 export class UploadService {
 
   async uploadVideo(file: Express.Multer.File, courseId: string) {
-    const fileName = ${courseId}/${Date.now()}-${file.originalname};
+    const fileName = `${courseId}/${Date.now()}-${file.originalname}`;
 
     await s3.send(new PutObjectCommand({
       Bucket: process.env.R2_BUCKET_NAME!,
@@ -29,12 +29,12 @@ export class UploadService {
       ContentType: file.mimetype,
     }));
 
-    const publicUrl = ${process.env.R2_PUBLIC_URL}/${fileName};
+    const publicUrl = `${process.env.R2_PUBLIC_URL}/${fileName}`;
     return { url: publicUrl };
   }
 
   async uploadPdf(file: Express.Multer.File, courseId: string) {
-    const fileName = pdfs/${courseId}/${Date.now()}-${file.originalname};
+    const fileName = `pdfs/${courseId}/${Date.now()}-${file.originalname}`;
 
     await s3.send(new PutObjectCommand({
       Bucket: process.env.R2_BUCKET_NAME!,
@@ -43,12 +43,12 @@ export class UploadService {
       ContentType: 'application/pdf',
     }));
 
-    const publicUrl = ${process.env.R2_PUBLIC_URL}/${fileName};
+    const publicUrl = `${process.env.R2_PUBLIC_URL}/${fileName}`;
     return { url: publicUrl };
   }
 
   async uploadImage(file: Express.Multer.File, folder: string) {
-    const fileName = images/${folder}/${Date.now()}-${file.originalname};
+    const fileName = `images/${folder}/${Date.now()}-${file.originalname}`;
 
     const { error } = await supabase.storage
       .from('videos')
