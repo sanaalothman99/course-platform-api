@@ -25,7 +25,7 @@ await s3.send(new PutObjectCommand({
   Bucket: process.env.R2_BUCKET_NAME!,
   Key: fileName,
   Body: file.buffer,
-  ContentType: 'application/pdf',
+  ContentType: file.mimetype,
 }));
 
 const publicUrl = `${process.env.R2_PUBLIC_URL}/${fileName}`;
@@ -40,7 +40,7 @@ return { url: publicUrl };
   Bucket: process.env.R2_BUCKET_NAME!,
   Key: fileName,
   Body: file.buffer,
-  ContentType: file.mimetype,
+  ContentType: 'application/pdf',
 }));
 
 const publicUrl = `${process.env.R2_PUBLIC_URL}/${fileName}`;
