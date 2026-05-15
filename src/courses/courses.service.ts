@@ -41,20 +41,21 @@ export class CoursesService {
     return this.prisma.course.create({ data });
   }
 
-  async updateLesson(
-    lessonId: string,
-    data: {
-      title?: string;
-      videoUrl?: string;
-      description?: string;
-      pdfUrl?: string;
-    },
-  ) {
-    return this.prisma.lesson.update({
-      where: { id: lessonId },
-      data,
-    });
-  }
+async updateLesson(
+  lessonId: string,
+  data: {
+    title?: string;
+    videoUrl?: string;
+    description?: string;
+    pdfUrl?: string;
+    thumbnailUrl?: string;
+  },
+) {
+  return this.prisma.lesson.update({
+    where: { id: lessonId },
+    data,
+  });
+}
 
   async delete(id: string) {
     return this.prisma.$transaction(async (tx) => {
