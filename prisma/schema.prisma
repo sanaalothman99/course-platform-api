@@ -42,18 +42,19 @@ model Course {
 }
 
 model Lesson {
-  id          String    @id @default(uuid())
-  title       String
-  videoUrl    String?
-  position    Int
-  courseId    String
-  description String?
-  pdfUrl      String?
-  chapterId   String?
-  progress    Progress[]
-  chapter     Chapter?  @relation(fields: [chapterId], references: [id])
-  comments    Comment[]
-  course      Course    @relation(fields: [courseId], references: [id])
+  id           String     @id @default(uuid())
+  title        String
+  videoUrl     String?
+  position     Int
+  courseId     String
+  description  String?
+  pdfUrl       String?
+  thumbnailUrl String?
+  chapterId    String?
+  progress     Progress[]
+  chapter      Chapter?   @relation(fields: [chapterId], references: [id])
+  comments     Comment[]
+  course       Course     @relation(fields: [courseId], references: [id])
 }
 
 model Order {
