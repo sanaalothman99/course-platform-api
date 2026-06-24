@@ -18,23 +18,23 @@ export class CoursesController {
     return this.coursesService.findOne(id);
   }
   @Put(':id')
-@UseGuards(JwtAuthGuard, RolesGuard)
-@Roles('ADMIN')
-update(
-  @Param('id') id: string,
-  @Body() body: Partial<{
-    title: string;
-    description: string;
-    price: number;
-    level: string;
-    thumbnail: string;
-    comingSoon: boolean;
-    hasLevels: boolean;
-    previewUrl: string;
-  }>,
-) {
-  return this.coursesService.update(id, body);
-}
+  @UseGuards(JwtAuthGuard, RolesGuard)
+  @Roles('ADMIN')
+  update(
+    @Param('id') id: string,
+    @Body() body: Partial<{
+      title: string;
+      description: string;
+      price: number;
+      level: string;
+      thumbnail: string;
+      comingSoon: boolean;
+      hasLevels: boolean;
+      previewUrl: string;
+    }>,
+  ) {
+    return this.coursesService.update(id, body);
+  }
 
   @Post()
   @UseGuards(JwtAuthGuard, RolesGuard)
@@ -48,20 +48,21 @@ update(
     return this.coursesService.create(body);
   }
 
-@Put('lessons/:lessonId')
-@UseGuards(JwtAuthGuard, RolesGuard)
-@Roles('ADMIN')
-updateLesson(
-  @Param('lessonId') lessonId: string,
-  @Body() body: {
-    title?: string
-    videoUrl?: string
-    description?: string
-    pdfUrl?: string
-  },
-) {
-  return this.coursesService.updateLesson(lessonId, body);
-}
+  @Put('lessons/:lessonId')
+  @UseGuards(JwtAuthGuard, RolesGuard)
+  @Roles('ADMIN')
+  updateLesson(
+    @Param('lessonId') lessonId: string,
+    @Body() body: {
+      title?: string
+      videoUrl?: string
+      description?: string
+      pdfUrl?: string
+      thumbnailUrl?: string
+    },
+  ) {
+    return this.coursesService.updateLesson(lessonId, body);
+  }
 
   @Delete(':id')
   @UseGuards(JwtAuthGuard, RolesGuard)
@@ -80,88 +81,115 @@ updateLesson(
   }) {
     return this.coursesService.addLesson(courseId, body);
   }
+
   @Delete('lessons/:lessonId')
-@UseGuards(JwtAuthGuard, RolesGuard)
-@Roles('ADMIN')
-deleteLesson(@Param('lessonId') lessonId: string) {
-  return this.coursesService.deleteLesson(lessonId);
-}
-@Get(':id/sub-courses')
-getSubCourses(@Param('id') id: string) {
-  return this.coursesService.getSubCourses(id);
-}
-@Post(':id/chapters')
-@UseGuards(JwtAuthGuard, RolesGuard)
-@Roles('ADMIN')
-addChapter(
-  @Param('id') courseId: string,
-  @Body() body: { title: string; position: number },
-) {
-  return this.coursesService.addChapter(courseId, body);
-}
+  @UseGuards(JwtAuthGuard, RolesGuard)
+  @Roles('ADMIN')
+  deleteLesson(@Param('lessonId') lessonId: string) {
+    return this.coursesService.deleteLesson(lessonId);
+  }
 
-@Put('chapters/:chapterId')
-@UseGuards(JwtAuthGuard, RolesGuard)
-@Roles('ADMIN')
-updateChapter(
-  @Param('chapterId') chapterId: string,
-  @Body() body: { title?: string; position?: number },
-) {
-  return this.coursesService.updateChapter(chapterId, body);
-}
+  @Get(':id/sub-courses')
+  getSubCourses(@Param('id') id: string) {
+    return this.coursesService.getSubCourses(id);
+  }
 
-@Delete('chapters/:chapterId')
-@UseGuards(JwtAuthGuard, RolesGuard)
-@Roles('ADMIN')
-deleteChapter(@Param('chapterId') chapterId: string) {
-  return this.coursesService.deleteChapter(chapterId);
-}
+  @Post(':id/chapters')
+  @UseGuards(JwtAuthGuard, RolesGuard)
+  @Roles('ADMIN')
+  addChapter(
+    @Param('id') courseId: string,
+    @Body() body: { title: string; position: number },
+  ) {
+    return this.coursesService.addChapter(courseId, body);
+  }
 
-@Post('chapters/:chapterId/lessons')
-@UseGuards(JwtAuthGuard, RolesGuard)
-@Roles('ADMIN')
-addLessonToChapter(
-  @Param('chapterId') chapterId: string,
-  @Body() body: { title: string; position: number; courseId: string },
-) {
-  return this.coursesService.addLessonToChapter(chapterId, body.courseId, {
-    title: body.title,
-    position: body.position,
-  });
-}
-@Put(':id/preview')
-@UseGuards(JwtAuthGuard, RolesGuard)
-@Roles('ADMIN')
-updatePreview(
-  @Param('id') id: string,
-  @Body() body: { previewUrl: string },
-) {
-  return this.coursesService.update(id, { previewUrl: body.previewUrl });
-}
-@Post('progress/:lessonId/complete')
-@UseGuards(JwtAuthGuard)
-markComplete(
-  @Param('lessonId') lessonId: string,
-  @Request() req: any,
-) {
-  return this.coursesService.markComplete(req.user.id, lessonId);
-}
+  @Put('chapters/:chapterId')
+  @UseGuards(JwtAuthGuard, RolesGuard)
+  @Roles('ADMIN')
+  updateChapter(
+    @Param('chapterId') chapterId: string,
+    @Body() body: { title?: string; position?: number },
+  ) {
+    return this.coursesService.updateChapter(chapterId, body);
+  }
 
-@Delete('progress/:lessonId/complete')
-@UseGuards(JwtAuthGuard)
-markIncomplete(
-  @Param('lessonId') lessonId: string,
-  @Request() req: any,
-) {
-  return this.coursesService.markIncomplete(req.user.id, lessonId);
-}
+  @Delete('chapters/:chapterId')
+  @UseGuards(JwtAuthGuard, RolesGuard)
+  @Roles('ADMIN')
+  deleteChapter(@Param('chapterId') chapterId: string) {
+    return this.coursesService.deleteChapter(chapterId);
+  }
 
-@Get(':id/progress')
-@UseGuards(JwtAuthGuard)
-getProgress(
-  @Param('id') courseId: string,
-  @Request() req: any,
-) {
-  return this.coursesService.getProgress(req.user.id, courseId);
-}
+  @Post('chapters/:chapterId/lessons')
+  @UseGuards(JwtAuthGuard, RolesGuard)
+  @Roles('ADMIN')
+  addLessonToChapter(
+    @Param('chapterId') chapterId: string,
+    @Body() body: { title: string; position: number; courseId: string },
+  ) {
+    return this.coursesService.addLessonToChapter(chapterId, body.courseId, {
+      title: body.title,
+      position: body.position,
+    });
+  }
+
+  @Put(':id/preview')
+  @UseGuards(JwtAuthGuard, RolesGuard)
+  @Roles('ADMIN')
+  updatePreview(
+    @Param('id') id: string,
+    @Body() body: { previewUrl: string },
+  ) {
+    return this.coursesService.update(id, { previewUrl: body.previewUrl });
+  }
+
+  @Post('progress/:lessonId/complete')
+  @UseGuards(JwtAuthGuard)
+  markComplete(
+    @Param('lessonId') lessonId: string,
+    @Request() req: any,
+  ) {
+    return this.coursesService.markComplete(req.user.id, lessonId);
+  }
+
+  @Delete('progress/:lessonId/complete')
+  @UseGuards(JwtAuthGuard)
+  markIncomplete(
+    @Param('lessonId') lessonId: string,
+    @Request() req: any,
+  ) {
+    return this.coursesService.markIncomplete(req.user.id, lessonId);
+  }
+
+  @Get(':id/progress')
+  @UseGuards(JwtAuthGuard)
+  getProgress(
+    @Param('id') courseId: string,
+    @Request() req: any,
+  ) {
+    return this.coursesService.getProgress(req.user.id, courseId);
+  }
+
+  @Post('lessons/:lessonId/files')
+  @UseGuards(JwtAuthGuard, RolesGuard)
+  @Roles('ADMIN')
+  addLessonFile(
+    @Param('lessonId') lessonId: string,
+    @Body() body: { fileUrl: string; fileName: string; fileType: string },
+  ) {
+    return this.coursesService.addLessonFile(lessonId, body);
+  }
+
+  @Delete('lessons/files/:fileId')
+  @UseGuards(JwtAuthGuard, RolesGuard)
+  @Roles('ADMIN')
+  deleteLessonFile(@Param('fileId') fileId: string) {
+    return this.coursesService.deleteLessonFile(fileId);
+  }
+
+  @Get('lessons/:lessonId/files')
+  getLessonFiles(@Param('lessonId') lessonId: string) {
+    return this.coursesService.getLessonFiles(lessonId);
+  }
 }

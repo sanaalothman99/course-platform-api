@@ -20,9 +20,10 @@ export class CoursesService {
       include: {
         lessons: {
           where: { chapterId: null },
+          include: { files: true },
         },
         chapters: {
-          include: { lessons: true },
+          include: { lessons: { include: { files: true } } },
           orderBy: { position: 'asc' },
         },
       },
@@ -41,21 +42,21 @@ export class CoursesService {
     return this.prisma.course.create({ data });
   }
 
-async updateLesson(
-  lessonId: string,
-  data: {
-    title?: string;
-    videoUrl?: string;
-    description?: string;
-    pdfUrl?: string;
-    thumbnailUrl?: string;
-  },
-) {
-  return this.prisma.lesson.update({
-    where: { id: lessonId },
-    data,
-  });
-}
+  async updateLesson(
+    lessonId: string,
+    data: {
+      title?: string;
+      videoUrl?: string;
+      description?: string;
+      pdfUrl?: string;
+      thumbnailUrl?: string;
+    },
+  ) {
+    return this.prisma.lesson.update({
+      where: { id: lessonId },
+      data,
+    });
+  }
 
   async delete(id: string) {
     return this.prisma.$transaction(async (tx) => {
@@ -79,42 +80,34 @@ async updateLesson(
 
       if (lessonIds.length > 0) {
         await tx.comment.deleteMany({
-          where: {
-            lessonId: { in: lessonIds },
-          },
+          where: { lessonId: { in: lessonIds } },
         });
 
         await tx.progress.deleteMany({
-          where: {
-            lessonId: { in: lessonIds },
-          },
+          where: { lessonId: { in: lessonIds } },
+        });
+
+        await tx.lessonFile.deleteMany({
+          where: { lessonId: { in: lessonIds } },
         });
 
         await tx.lesson.deleteMany({
-          where: {
-            id: { in: lessonIds },
-          },
+          where: { id: { in: lessonIds } },
         });
       }
 
       if (chapterIds.length > 0) {
         await tx.chapter.deleteMany({
-          where: {
-            id: { in: chapterIds },
-          },
+          where: { id: { in: chapterIds } },
         });
       }
 
       await tx.order.deleteMany({
-        where: {
-          courseId: { in: courseIds },
-        },
+        where: { courseId: { in: courseIds } },
       });
 
       await tx.course.deleteMany({
-        where: {
-          parentId: id,
-        },
+        where: { parentId: id },
       });
 
       return tx.course.delete({
@@ -129,6 +122,10 @@ async updateLesson(
     });
 
     await this.prisma.progress.deleteMany({
+      where: { lessonId },
+    });
+
+    await this.prisma.lessonFile.deleteMany({
       where: { lessonId },
     });
 
@@ -150,13 +147,14 @@ async updateLesson(
     });
   }
 
- async getSubCourses(parentId: string) {
-  return this.prisma.course.findMany({
-    where: { parentId },
-    include: { lessons: true },
-    orderBy: { createdAt: 'asc' },
-  });
-}
+  async getSubCourses(parentId: string) {
+    return this.prisma.course.findMany({
+      where: { parentId },
+      include: { lessons: true },
+      orderBy: { createdAt: 'asc' },
+    });
+  }
+
   async addChapter(courseId: string, data: { title: string; position: number }) {
     return this.prisma.chapter.create({
       data: { ...data, courseId },
@@ -180,15 +178,15 @@ async updateLesson(
 
     if (lessonIds.length > 0) {
       await this.prisma.comment.deleteMany({
-        where: {
-          lessonId: { in: lessonIds },
-        },
+        where: { lessonId: { in: lessonIds } },
       });
 
       await this.prisma.progress.deleteMany({
-        where: {
-          lessonId: { in: lessonIds },
-        },
+        where: { lessonId: { in: lessonIds } },
+      });
+
+      await this.prisma.lessonFile.deleteMany({
+        where: { lessonId: { in: lessonIds } },
       });
 
       await this.prisma.lesson.deleteMany({
@@ -255,6 +253,24 @@ async updateLesson(
         lesson: { courseId },
       },
       select: { lessonId: true },
+    });
+  }
+
+  async addLessonFile(lessonId: string, data: { fileUrl: string; fileName: string; fileType: string }) {
+    return this.prisma.lessonFile.create({
+      data: { ...data, lessonId },
+    });
+  }
+
+  async deleteLessonFile(fileId: string) {
+    return this.prisma.lessonFile.delete({
+      where: { id: fileId },
+    });
+  }
+
+  async getLessonFiles(lessonId: string) {
+    return this.prisma.lessonFile.findMany({
+      where: { lessonId },
     });
   }
 }

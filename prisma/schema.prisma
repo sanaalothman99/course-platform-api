@@ -42,7 +42,7 @@ model Course {
 }
 
 model Lesson {
-  id           String     @id @default(uuid())
+  id           String       @id @default(uuid())
   title        String
   videoUrl     String?
   position     Int
@@ -52,11 +52,20 @@ model Lesson {
   thumbnailUrl String?
   chapterId    String?
   progress     Progress[]
-  chapter      Chapter?   @relation(fields: [chapterId], references: [id])
+  chapter      Chapter?     @relation(fields: [chapterId], references: [id])
   comments     Comment[]
-  course       Course     @relation(fields: [courseId], references: [id])
+  course       Course       @relation(fields: [courseId], references: [id])
+  files        LessonFile[]
 }
-
+model LessonFile {
+  id        String   @id @default(uuid())
+  lessonId  String
+  fileUrl   String
+  fileName  String
+  fileType  String
+  createdAt DateTime @default(now())
+  lesson    Lesson   @relation(fields: [lessonId], references: [id], onDelete: Cascade)
+}
 model Order {
   id              String   @id @default(uuid())
   userId          String
