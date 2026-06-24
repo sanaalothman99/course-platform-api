@@ -41,4 +41,14 @@ export class UploadController {
   ) {
     return this.uploadService.uploadImage(file, folder);
   }
+  @Post('file/:folder')
+@UseGuards(JwtAuthGuard, RolesGuard)
+@Roles('ADMIN')
+@UseInterceptors(FileInterceptor('file'))
+uploadFile(
+  @UploadedFile() file: Express.Multer.File,
+  @Param('folder') folder: string,
+) {
+  return this.uploadService.uploadFile(file, folder);
+}
 }

@@ -65,4 +65,17 @@ return { url: publicUrl };
 
     return { url: urlData.publicUrl };
   }
+  async uploadFile(file: Express.Multer.File, folder: string) {
+  const fileName = `files/${folder}/${Date.now()}-${file.originalname}`;
+
+  await s3.send(new PutObjectCommand({
+    Bucket: process.env.R2_BUCKET_NAME!,
+    Key: fileName,
+    Body: file.buffer,
+    ContentType: file.mimetype,
+  }));
+
+  const publicUrl = `${process.env.R2_PUBLIC_URL}/${fileName}`;
+  return { url: publicUrl };
+}
 }
