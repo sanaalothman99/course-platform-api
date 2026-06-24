@@ -1,6 +1,8 @@
 import { Injectable } from '@nestjs/common';
 import { createClient } from '@supabase/supabase-js';
 import { S3Client, PutObjectCommand } from '@aws-sdk/client-s3';
+import axios from 'axios';
+import { Response } from 'express';
 
 const s3 = new S3Client({
   region: 'auto',
@@ -78,5 +80,11 @@ async uploadFile(file: Express.Multer.File, folder: string) {
 
   const publicUrl = `${process.env.R2_PUBLIC_URL}/${fileName}`;
   return { url: publicUrl };
+}
+async streamDownload(url: string, filename: string, res: Response) {
+  const response = await axios.get(url, { responseType: 'stream' });
+  res.setHeader('Content-Disposition', `attachment; filename="${filename}"`);
+  res.setHeader('Content-Type', 'application/octet-stream');
+  response.data.pipe(res);
 }
 }

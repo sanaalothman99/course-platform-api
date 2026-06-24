@@ -1,9 +1,11 @@
-import { Controller, Post, UseInterceptors, UploadedFile, Param, UseGuards } from '@nestjs/common';
+import { Controller, Post, Get, Query, Res, UseInterceptors, UploadedFile, Param, UseGuards } from '@nestjs/common;
 import { FileInterceptor } from '@nestjs/platform-express';
 import { UploadService } from './upload.service';
 import { JwtAuthGuard } from '../auth/jwt-auth.guard';
 import { RolesGuard } from '../auth/roles.guard';
 import { Roles } from '../auth/roles.decorator';
+import express from 'express';
+import { Res } from '@nestjs/common';
 
 @Controller('upload')
 export class UploadController {
@@ -50,5 +52,13 @@ uploadFile(
   @Param('folder') folder: string,
 ) {
   return this.uploadService.uploadFile(file, folder);
+}
+@Get('download')
+async downloadFile(
+  @Query('url') url: string,
+  @Query('filename') filename: string,
+  @Res() res: express.Response,
+) {
+  return this.uploadService.streamDownload(url, filename, res);
 }
 }
