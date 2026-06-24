@@ -5,7 +5,7 @@ import { JwtAuthGuard } from '../auth/jwt-auth.guard';
 import { RolesGuard } from '../auth/roles.guard';
 import { Roles } from '../auth/roles.decorator';
 import express from 'express';
-import { Res } from '@nestjs/common';
+
 
 @Controller('upload')
 export class UploadController {
