@@ -66,6 +66,7 @@ export class CoursesController {
     @Param('lessonId') lessonId: string,
     @Body() body: {
       title?: string
+      titleAr?: string
       videoUrl?: string
       description?: string
       pdfUrl?: string

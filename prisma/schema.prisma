@@ -46,6 +46,7 @@ model Course {
 model Lesson {
   id           String       @id @default(uuid())
   title        String
+  titleAr      String?
   videoUrl     String?
   position     Int
   courseId     String

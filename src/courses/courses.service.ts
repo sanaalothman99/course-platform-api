@@ -67,6 +67,7 @@ export class CoursesService {
     lessonId: string,
     data: {
       title?: string;
+      titleAr?: string;
       videoUrl?: string;
       description?: string;
       pdfUrl?: string;
