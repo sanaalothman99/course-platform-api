@@ -1,9 +1,28 @@
 import { Injectable } from '@nestjs/common';
+import axios from 'axios';
 import { PrismaService } from '../prisma/prisma.service';
 
 @Injectable()
 export class CoursesService {
   constructor(private prisma: PrismaService) {}
+
+  async translateToArabic(text: string) {
+    if (!text) return { translated: '' };
+    const res = await axios.get(
+      'https://translate.googleapis.com/translate_a/single',
+      {
+        params: {
+          client: 'gtx',
+          sl: 'en',
+          tl: 'ar',
+          dt: 't',
+          q: text,
+        },
+      },
+    );
+    const translated = res.data[0].map((part: any) => part[0]).join('');
+    return { translated };
+  }
 
   async findAll() {
     return this.prisma.course.findMany({
@@ -33,6 +52,8 @@ export class CoursesService {
   async create(data: {
     title: string;
     description: string;
+    titleAr?: string;
+    descriptionAr?: string;
     price: number;
     level: string;
     thumbnail?: string;
@@ -217,6 +238,8 @@ export class CoursesService {
     data: Partial<{
       title: string;
       description: string;
+      titleAr: string;
+      descriptionAr: string;
       price: number;
       level: string;
       isPublished: boolean;

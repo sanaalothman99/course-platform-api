@@ -21,9 +21,11 @@ model User {
 }
 
 model Course {
-  id          String   @id @default(uuid())
-  title       String
-  description String
+  id            String   @id @default(uuid())
+  title         String
+  description   String
+  titleAr       String?
+  descriptionAr String?
   price       Float
   level       String
   isPublished Boolean  @default(false)

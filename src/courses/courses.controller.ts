@@ -25,6 +25,8 @@ export class CoursesController {
     @Body() body: Partial<{
       title: string;
       description: string;
+      titleAr: string;
+      descriptionAr: string;
       price: number;
       level: string;
       thumbnail: string;
@@ -42,10 +44,19 @@ export class CoursesController {
   create(@Body() body: {
     title: string;
     description: string;
+    titleAr?: string;
+    descriptionAr?: string;
     price: number;
     level: string;
   }) {
     return this.coursesService.create(body);
+  }
+
+  @Post('translate')
+  @UseGuards(JwtAuthGuard, RolesGuard)
+  @Roles('ADMIN')
+  translate(@Body() body: { text: string }) {
+    return this.coursesService.translateToArabic(body.text);
   }
 
   @Put('lessons/:lessonId')
