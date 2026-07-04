@@ -93,12 +93,15 @@ model Comment {
 }
 
 model Chapter {
-  id        String   @id @default(uuid())
+  id        String    @id @default(uuid())
   title     String
   position  Int
   courseId  String
-  createdAt DateTime @default(now())
-  course    Course   @relation(fields: [courseId], references: [id])
+  parentId  String?
+  createdAt DateTime  @default(now())
+  course    Course    @relation(fields: [courseId], references: [id])
+  parent    Chapter?  @relation("SubChapters", fields: [parentId], references: [id])
+  children  Chapter[] @relation("SubChapters")
   lessons   Lesson[]
 }
 

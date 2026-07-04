@@ -23,7 +23,12 @@ export class CoursesService {
     const translated = res.data[0].map((part: any) => part[0]).join('');
     return { translated };
   }
-
+  
+async addSubChapter(parentChapterId: string, courseId: string, data: { title: string; position: number }) {
+  return this.prisma.chapter.create({
+    data: { ...data, courseId, parentId: parentChapterId },
+  });
+}
   async findAll() {
     return this.prisma.course.findMany({
       include: {
@@ -33,21 +38,37 @@ export class CoursesService {
     });
   }
 
-  async findOne(id: string) {
-    return this.prisma.course.findUnique({
-      where: { id },
-      include: {
-        lessons: {
-          where: { chapterId: null },
-          include: { files: true },
-        },
-        chapters: {
-          include: { lessons: { include: { files: true } } },
-          orderBy: { position: 'asc' },
-        },
+async findOne(id: string) {
+  return this.prisma.course.findUnique({
+    where: { id },
+    include: {
+      lessons: {
+        where: { chapterId: null },
+        include: { files: true },
+        orderBy: { position: 'asc' },
       },
-    });
-  }
+      chapters: {
+        where: { parentId: null },
+        include: {
+          lessons: {
+            include: { files: true },
+            orderBy: { position: 'asc' },
+          },
+          children: {
+            include: {
+              lessons: {
+                include: { files: true },
+                orderBy: { position: 'asc' },
+              },
+            },
+            orderBy: { position: 'asc' },
+          },
+        },
+        orderBy: { position: 'asc' },
+      },
+    },
+  });
+}
 
   async create(data: {
     title: string;

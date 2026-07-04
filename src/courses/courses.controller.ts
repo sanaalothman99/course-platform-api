@@ -204,4 +204,16 @@ export class CoursesController {
   getLessonFiles(@Param('lessonId') lessonId: string) {
     return this.coursesService.getLessonFiles(lessonId);
   }
+  @Post('chapters/:chapterId/sub-chapters')
+@UseGuards(JwtAuthGuard, RolesGuard)
+@Roles('ADMIN')
+addSubChapter(
+  @Param('chapterId') chapterId: string,
+  @Body() body: { title: string; position: number; courseId: string },
+) {
+  return this.coursesService.addSubChapter(chapterId, body.courseId, {
+    title: body.title,
+    position: body.position,
+  });
+}
 }
