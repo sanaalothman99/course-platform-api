@@ -56,7 +56,7 @@ return { url: publicUrl };
       .from('videos')
       .upload(fileName, file.buffer, {
         contentType: file.mimetype,
-        upsert: false,
+        upsert: true,
       });
 
     if (error) throw new Error(error.message);
