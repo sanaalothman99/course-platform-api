@@ -1,17 +1,8 @@
 import { Injectable } from '@nestjs/common';
 import { PrismaService } from '../prisma/prisma.service';
-import * as nodemailer from 'nodemailer';
+import { Resend } from 'resend';
 
-const transporter = nodemailer.createTransport({
-  service: 'gmail',
-  auth: {
-    user: process.env.EMAIL_USER,
-    pass: process.env.EMAIL_PASS,
-  },
-  tls:{
-    rejectUnauthorized:false,
-  },
-});
+const resend = new Resend(process.env.RESEND_API_KEY);
 
 @Injectable()
 export class CommentsService {
@@ -25,9 +16,8 @@ export class CommentsService {
       },
     });
 
-    // إرسال إيميل بشكل منفصل — لا يوقف الرد
-    transporter.sendMail({
-      from: process.env.EMAIL_USER,
+    resend.emails.send({
+      from: 'A to Z Automation <onboarding@resend.dev>',
       to: 'Atoz96automation@gmail.com',
       subject: '💬 New Comment on A to Z Automation',
       html: `
@@ -38,8 +28,8 @@ export class CommentsService {
         <br/>
         <p>Login to admin panel to reply.</p>
       `,
-    }).then(() => console.log('Email sent (comment) to Atoz96automation@gmail.com'))
-      .catch((err) => console.error('Email error (comment):', err.message));
+    }).then(() => console.log('Email sent (comment)'))
+      .catch((err: any) => console.error('Email error (comment):', err.message));
 
     return comment;
   }
@@ -57,10 +47,9 @@ export class CommentsService {
       },
     });
 
-    // إرسال إيميل للطالب بشكل منفصل
     if (reply.parent?.user?.email) {
-      transporter.sendMail({
-        from: process.env.EMAIL_USER,
+      resend.emails.send({
+        from: 'A to Z Automation <onboarding@resend.dev>',
         to: reply.parent.user.email,
         subject: '✅ Reply to your comment — A to Z Automation',
         html: `

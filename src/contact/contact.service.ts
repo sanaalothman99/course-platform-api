@@ -1,24 +1,15 @@
 import { Injectable } from '@nestjs/common';
-import * as nodemailer from 'nodemailer';
+import { Resend } from 'resend';
 
-const transporter = nodemailer.createTransport({
-  service: 'gmail',
-  auth: {
-    user: process.env.EMAIL_USER,
-    pass: process.env.EMAIL_PASS,
-  },
-  tls: {
-    rejectUnauthorized: false,
-  },
-});
+const resend = new Resend(process.env.RESEND_API_KEY);
 
 @Injectable()
 export class ContactService {
   async sendMessage(name: string, email: string, subject: string, message: string) {
-    transporter.sendMail({
-      from: process.env.EMAIL_USER,
+    resend.emails.send({
+      from: 'A to Z Automation <onboarding@resend.dev>',
       to: 'Atoz96automation@gmail.com',
-      subject: `📩 New Contact Message: ${subject || "No Subject"}`,
+      subject: `📩 New Contact Message: ${subject || 'No Subject'}`,
       html: `
         <h2>New Contact Message</h2>
         <p><strong>From:</strong> ${name}</p>
@@ -27,8 +18,8 @@ export class ContactService {
         <p><strong>Message:</strong></p>
         <p>${message}</p>
       `,
-    }).then(() => console.log('Email sent (contact) to Atoz96automation@gmail.com'))
-      .catch((err) => console.error('Email error (contact):', err.message));
+    }).then(() => console.log('Email sent (contact)'))
+      .catch((err: any) => console.error('Email error (contact):', err.message));
 
     return { message: 'Message sent successfully' };
   }
