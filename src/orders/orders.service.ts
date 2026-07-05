@@ -19,7 +19,7 @@ export class OrdersService {
 
       const session = await stripe.checkout.sessions.create({
         mode: 'payment',
-        success_url: `${process.env.FRONTEND_URL}/en/courses/${courseId}`,
+        success_url: `${process.env.FRONTEND_URL}/en/courses/${courseId}?session_id={CHECKOUT_SESSION_ID}`,
         cancel_url: `${process.env.FRONTEND_URL}/en/courses/${courseId}`,
         line_items: [
           {
@@ -43,6 +43,20 @@ export class OrdersService {
       }
       throw error;
     }
+  }
+
+  async verifySession(sessionId: string, userId: string) {
+    const session = await stripe.checkout.sessions.retrieve(sessionId);
+    if (session.payment_status !== 'paid') return { success: false };
+
+    const courseId = session.metadata?.courseId;
+    if (!courseId) return { success: false };
+
+    const existing = await this.prisma.order.findFirst({ where: { userId, courseId } });
+    if (!existing) {
+      await this.prisma.order.create({ data: { userId, courseId } });
+    }
+    return { success: true, courseId };
   }
 
   async handleWebhook(payload: Buffer, signature: string) {

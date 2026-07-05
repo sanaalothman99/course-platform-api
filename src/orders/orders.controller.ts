@@ -14,6 +14,12 @@ export class OrdersController {
     return this.ordersService.createCheckoutSession(req.user.id, body.courseId);
   }
 
+  @Post('verify-session')
+  @UseGuards(JwtAuthGuard)
+  verifySession(@Request() req: any, @Body() body: { sessionId: string }) {
+    return this.ordersService.verifySession(body.sessionId, req.user.id);
+  }
+
   @Post('webhook')
   handleWebhook(
     @Req() req: any,
