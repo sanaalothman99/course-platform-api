@@ -40,12 +40,12 @@ export class AuthService {
   async login(email: string, password: string, deviceId?: string) {
     const user = await this.usersService.findByEmail(email.toLowerCase().trim());
     if (!user) {
-      throw new UnauthorizedException('Invalid credentials');
+      throw new UnauthorizedException('User not found: ' + email.toLowerCase().trim());
     }
 
     const isPasswordValid = await bcrypt.compare(password, user.password);
     if (!isPasswordValid) {
-      throw new UnauthorizedException('Invalid credentials');
+      throw new UnauthorizedException('Wrong password for: ' + user.email);
     }
 
     // Device Lock — ADMIN مستثنى
