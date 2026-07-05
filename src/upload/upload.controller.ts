@@ -1,4 +1,4 @@
-import { Controller, Post, Get, Query, Res, UseInterceptors, UploadedFile, Param, UseGuards } from '@nestjs/common';
+import { Controller, Post, Get, Query, Res, UseInterceptors, UploadedFile, Param, UseGuards, Body } from '@nestjs/common';
 import { FileInterceptor } from '@nestjs/platform-express';
 import { UploadService } from './upload.service';
 import { JwtAuthGuard } from '../auth/jwt-auth.guard';
@@ -53,6 +53,15 @@ uploadFile(
 ) {
   return this.uploadService.uploadFile(file, folder);
 }
+@Post('presigned-url/video')
+@UseGuards(JwtAuthGuard, RolesGuard)
+@Roles('ADMIN')
+getVideoPresignedUrl(
+  @Body() body: { courseId: string; filename: string; contentType: string },
+) {
+  return this.uploadService.getVideoPresignedUrl(body.courseId, body.filename, body.contentType);
+}
+
 @Get('download')
 async downloadFile(
   @Query('url') url: string,

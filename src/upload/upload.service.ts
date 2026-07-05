@@ -1,6 +1,7 @@
 import { Injectable } from '@nestjs/common';
 import { createClient } from '@supabase/supabase-js';
 import { S3Client, PutObjectCommand } from '@aws-sdk/client-s3';
+import { getSignedUrl } from '@aws-sdk/s3-request-presigner';
 import axios from 'axios';
 import { Response } from 'express';
 
@@ -81,6 +82,18 @@ async uploadFile(file: Express.Multer.File, folder: string) {
   const publicUrl = `${process.env.R2_PUBLIC_URL}/${fileName}`;
   return { url: publicUrl };
 }
+async getVideoPresignedUrl(courseId: string, filename: string, contentType: string) {
+  const key = `${courseId}/${Date.now()}-${filename}`;
+  const command = new PutObjectCommand({
+    Bucket: process.env.R2_BUCKET_NAME!,
+    Key: key,
+    ContentType: contentType,
+  });
+  const presignedUrl = await getSignedUrl(s3, command, { expiresIn: 3600 });
+  const publicUrl = `${process.env.R2_PUBLIC_URL}/${key}`;
+  return { presignedUrl, publicUrl };
+}
+
 async streamDownload(url: string, filename: string, res: Response) {
   const response = await axios.get(url, { responseType: 'stream' });
   res.setHeader('Content-Disposition', `attachment; filename="${filename}"`);
