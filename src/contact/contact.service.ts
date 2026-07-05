@@ -15,7 +15,7 @@ const transporter = nodemailer.createTransport({
 @Injectable()
 export class ContactService {
   async sendMessage(name: string, email: string, subject: string, message: string) {
-    await transporter.sendMail({
+    transporter.sendMail({
       from: process.env.EMAIL_USER,
       to: 'Atoz96automation@gmail.com',
       subject: `📩 New Contact Message: ${subject || "No Subject"}`,
@@ -27,7 +27,7 @@ export class ContactService {
         <p><strong>Message:</strong></p>
         <p>${message}</p>
       `,
-    });
+    }).catch(() => {});
 
     return { message: 'Message sent successfully' };
   }

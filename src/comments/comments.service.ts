@@ -25,8 +25,8 @@ export class CommentsService {
       },
     });
 
-    // إرسال إيميل لصاحب الموقع
-    await transporter.sendMail({
+    // إرسال إيميل بشكل منفصل — لا يوقف الرد
+    transporter.sendMail({
       from: process.env.EMAIL_USER,
       to: 'Atoz96automation@gmail.com',
       subject: '💬 New Comment on A to Z Automation',
@@ -38,7 +38,7 @@ export class CommentsService {
         <br/>
         <p>Login to admin panel to reply.</p>
       `,
-    });
+    }).catch(() => {});
 
     return comment;
   }
@@ -56,9 +56,9 @@ export class CommentsService {
       },
     });
 
-    // إرسال إيميل للطالب
+    // إرسال إيميل للطالب بشكل منفصل
     if (reply.parent?.user?.email) {
-      await transporter.sendMail({
+      transporter.sendMail({
         from: process.env.EMAIL_USER,
         to: reply.parent.user.email,
         subject: '✅ Reply to your comment — A to Z Automation',
@@ -69,7 +69,7 @@ export class CommentsService {
           <br/>
           <p>Login to your account to see the full conversation.</p>
         `,
-      });
+      }).catch(() => {});
     }
 
     return reply;
