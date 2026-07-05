@@ -11,14 +11,15 @@ export class AuthService {
   ) {}
 
   async register(email: string, password: string, name: string) {
-    const existingUser = await this.usersService.findByEmail(email);
+    const normalizedEmail = email.toLowerCase().trim();
+    const existingUser = await this.usersService.findByEmail(normalizedEmail);
     if (existingUser) {
       throw new ConflictException('Email already exists');
     }
 
     const hashedPassword = await bcrypt.hash(password, 10);
     const user = await this.usersService.create({
-      email,
+      email: normalizedEmail,
       password: hashedPassword,
       name,
     });
@@ -37,7 +38,7 @@ export class AuthService {
   }
 
   async login(email: string, password: string, deviceId?: string) {
-    const user = await this.usersService.findByEmail(email);
+    const user = await this.usersService.findByEmail(email.toLowerCase().trim());
     if (!user) {
       throw new UnauthorizedException('Invalid credentials');
     }
