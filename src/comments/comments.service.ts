@@ -38,7 +38,7 @@ export class CommentsService {
         <br/>
         <p>Login to admin panel to reply.</p>
       `,
-    }).catch(() => {});
+    }).catch((err) => console.error('Email error (comment):', err.message));
 
     return comment;
   }

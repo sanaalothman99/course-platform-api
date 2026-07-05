@@ -27,7 +27,7 @@ export class ContactService {
         <p><strong>Message:</strong></p>
         <p>${message}</p>
       `,
-    }).catch(() => {});
+    }).catch((err) => console.error('Email error (contact):', err.message));
 
     return { message: 'Message sent successfully' };
   }
