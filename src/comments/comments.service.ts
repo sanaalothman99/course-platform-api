@@ -38,7 +38,8 @@ export class CommentsService {
         <br/>
         <p>Login to admin panel to reply.</p>
       `,
-    }).catch((err) => console.error('Email error (comment):', err.message));
+    }).then(() => console.log('Email sent (comment) to Atoz96automation@gmail.com'))
+      .catch((err) => console.error('Email error (comment):', err.message));
 
     return comment;
   }
