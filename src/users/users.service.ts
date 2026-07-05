@@ -5,17 +5,13 @@ import { PrismaService } from '../prisma/prisma.service';
 export class UsersService {
   constructor(private prisma: PrismaService) {}
 async findByEmail(email: string) {
-  return this.prisma.user.findFirst({
-    where: { email: { equals: email, mode: 'insensitive' } },
-    select: {
-      id: true,
-      email: true,
-      password: true,
-      name: true,
-      role: true,
-      deviceId: true,
-    },
-  });
+  const results = await this.prisma.$queryRaw<any[]>`
+    SELECT id, email, password, name, role, "deviceId"
+    FROM "User"
+    WHERE LOWER(TRIM(email)) = LOWER(TRIM(${email}))
+    LIMIT 1
+  `;
+  return results[0] || null;
 }
 
   async create(data: { email: string; password: string; name: string }) {
