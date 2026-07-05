@@ -19,8 +19,8 @@ export class OrdersService {
 
       const session = await stripe.checkout.sessions.create({
         mode: 'payment',
-        success_url: 'https://google.com',
-        cancel_url: 'https://google.com',
+        success_url: `${process.env.FRONTEND_URL}/en/courses/${courseId}`,
+        cancel_url: `${process.env.FRONTEND_URL}/en/courses/${courseId}`,
         line_items: [
           {
             price_data: {
