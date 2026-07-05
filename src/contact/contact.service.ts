@@ -7,7 +7,7 @@ const resend = new Resend(process.env.RESEND_API_KEY);
 export class ContactService {
   async sendMessage(name: string, email: string, subject: string, message: string) {
     resend.emails.send({
-      from: 'A to Z Automation <onboarding@resend.dev>',
+      from: 'A to Z Automation <noreply@atozautomation.de>',
       to: 'Atoz96automation@gmail.com',
       subject: `📩 New Contact Message: ${subject || 'No Subject'}`,
       html: `

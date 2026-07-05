@@ -17,7 +17,7 @@ export class CommentsService {
     });
 
     resend.emails.send({
-      from: 'A to Z Automation <onboarding@resend.dev>',
+      from: 'A to Z Automation <noreply@atozautomation.de>',
       to: 'Atoz96automation@gmail.com',
       subject: '💬 New Comment on A to Z Automation',
       html: `
@@ -49,7 +49,7 @@ export class CommentsService {
 
     if (reply.parent?.user?.email) {
       resend.emails.send({
-        from: 'A to Z Automation <onboarding@resend.dev>',
+        from: 'A to Z Automation <noreply@atozautomation.de>',
         to: reply.parent.user.email,
         subject: '✅ Reply to your comment — A to Z Automation',
         html: `
