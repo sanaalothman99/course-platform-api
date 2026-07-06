@@ -86,7 +86,9 @@ export class CommentsService {
       include: {
         user: { select: { name: true, email: true } },
         lesson: { select: { title: true } },
-        replies: true,
+        replies: {
+        include: { user: { select: { name: true } } },
+      },
       },
       orderBy: { createdAt: 'desc' },
     });
