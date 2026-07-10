@@ -72,9 +72,10 @@ export class OrdersService {
     if (event.type === 'checkout.session.completed') {
       const session = event.data.object as Stripe.Checkout.Session;
       const { userId, courseId } = session.metadata!;
-      await this.prisma.order.create({
-        data: { userId, courseId },
-      });
+      const existing = await this.prisma.order.findFirst({ where: { userId, courseId } });
+      if (!existing) {
+        await this.prisma.order.create({ data: { userId, courseId } });
+      }
     }
 
     return { received: true };
