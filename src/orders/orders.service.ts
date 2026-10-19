@@ -8,42 +8,52 @@ const stripe = new Stripe((process.env.STRIPE_SECRET_KEY || '').trim(), {
 @Injectable()
 export class OrdersService {
   constructor(private prisma: PrismaService) {}
+async createCheckoutSession(userId: string, courseId: string) {
+  try {
+    const course = await this.prisma.course.findUnique({
+      where: { id: courseId },
+    });
 
-  async createCheckoutSession(userId: string, courseId: string) {
-    try {
-      const course = await this.prisma.course.findUnique({
-        where: { id: courseId },
-      });
+    if (!course) throw new Error('Course not found');
 
-      if (!course) throw new Error('Course not found');
+    // تحقق من العرض
+    const now = new Date();
+    const hasDiscount =
+      course.discountPrice &&
+      course.discountStart &&
+      course.discountEnd &&
+      now >= new Date(course.discountStart) &&
+      now <= new Date(course.discountEnd);
 
-      const session = await stripe.checkout.sessions.create({
-        mode: 'payment',
-        success_url: `${process.env.FRONTEND_URL}/en/courses/${courseId}?session_id={CHECKOUT_SESSION_ID}`,
-        cancel_url: `${process.env.FRONTEND_URL}/en/courses/${courseId}`,
-        line_items: [
-          {
-            price_data: {
-              currency: 'usd',
-              product_data: { name: course.title },
-              unit_amount: Math.round(course.price * 100),
-            },
-            quantity: 1,
+    const finalPrice = hasDiscount ? course.discountPrice! : course.price;
+
+    const session = await stripe.checkout.sessions.create({
+      mode: 'payment',
+      success_url: `${process.env.FRONTEND_URL}/en/courses/${courseId}?session_id={CHECKOUT_SESSION_ID}`,
+      cancel_url: `${process.env.FRONTEND_URL}/en/courses/${courseId}`,
+      line_items: [
+        {
+          price_data: {
+            currency: 'usd',
+            product_data: { name: course.title },
+            unit_amount: Math.round(finalPrice * 100),
           },
-        ],
-        metadata: { userId, courseId },
-      });
+          quantity: 1,
+        },
+      ],
+      metadata: { userId, courseId },
+    });
 
-      return { url: session.url };
-    } catch (error) {
-      if (error instanceof Error) {
-        console.error('Stripe Error:', error.message);
-      } else {
-        console.error('Stripe Error:', error);
-      }
-      throw error;
+    return { url: session.url };
+  } catch (error) {
+    if (error instanceof Error) {
+      console.error('Stripe Error:', error.message);
+    } else {
+      console.error('Stripe Error:', error);
     }
+    throw error;
   }
+}
 
   async verifySession(sessionId: string, userId: string) {
     const session = await stripe.checkout.sessions.retrieve(sessionId);

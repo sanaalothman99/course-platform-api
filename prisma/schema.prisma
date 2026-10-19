@@ -118,6 +118,10 @@ model Progress {
 
   @@unique([userId, lessonId])
 }
+model Settings {
+  id                String  @id @default("main")
+  maintenanceMode   Boolean @default(false)
+}
 
 enum Role {
   ADMIN
