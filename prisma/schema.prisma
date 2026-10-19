@@ -37,6 +37,9 @@ model Course {
   parentId    String?
   parent      Course?  @relation("CourseLevel", fields: [parentId], references: [id])
   children    Course[] @relation("CourseLevel")
+  discountPrice Float?
+  discountStart DateTime?
+  discountEnd   DateTime?
   lessons     Lesson[]
   orders      Order[]
   previewUrl  String?

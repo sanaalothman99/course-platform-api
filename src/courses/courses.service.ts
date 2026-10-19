@@ -269,6 +269,9 @@ async findOne(id: string) {
       previewUrl: string;
       comingSoon: boolean;
       hasLevels: boolean;
+      discountPrice: number;
+      discountStart: string;
+      discountEnd: string;
     }>,
   ) {
     return this.prisma.course.update({

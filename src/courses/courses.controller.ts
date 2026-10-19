@@ -33,6 +33,9 @@ export class CoursesController {
       comingSoon: boolean;
       hasLevels: boolean;
       previewUrl: string;
+      discountPrice?: number;
+      discountStart?: string;
+      discountEnd?: string;
     }>,
   ) {
     return this.coursesService.update(id, body);
