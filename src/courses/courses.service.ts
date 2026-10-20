@@ -93,6 +93,7 @@ async findOne(id: string) {
       description?: string;
       pdfUrl?: string;
       thumbnailUrl?: string;
+      isFree?:boolean;
     },
   ) {
     return this.prisma.lesson.update({

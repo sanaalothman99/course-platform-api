@@ -57,6 +57,7 @@ model Lesson {
   pdfUrl       String?
   thumbnailUrl String?
   chapterId    String?
+  isFree       Boolean      @default(false)
   progress     Progress[]
   chapter      Chapter?     @relation(fields: [chapterId], references: [id])
   comments     Comment[]

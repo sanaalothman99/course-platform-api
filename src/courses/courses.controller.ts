@@ -74,6 +74,7 @@ export class CoursesController {
       description?: string
       pdfUrl?: string
       thumbnailUrl?: string
+      isFree?: boolean
     },
   ) {
     return this.coursesService.updateLesson(lessonId, body);
